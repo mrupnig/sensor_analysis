@@ -1,28 +1,29 @@
-from typing import List, Sequence
-from .data_loader import Reading
+from __future__ import annotations
 
+import pandas as pd
 
-def filter_outliers(values: Sequence[float], upper_threshold: float) -> List[float]:
-    """Entfernt Werte oberhalb eines Schwellwerts (sehr einfache Outlier-Logik)."""
-    return [v for v in values if v <= upper_threshold]
-
-
-def moving_average(values: Sequence[float], window_size: int = 3) -> List[float]:
+def year_doy_heatmap_matrix(daily: pd.Series) -> pd.DataFrame:
     """
-    Einfache gleitende Mittelwerte über die letzten window_size Werte.
+    Baut eine Matrix: Zeilen=Jahr, Spalten=Tag des Jahres (1..366),
+    Werte=Tagesmitteltemperatur.
+
+    Vorteil: Sehr visuelle Darstellung von Saisonverläufen + Anomalien.
     """
-    if window_size <= 0:
-        raise ValueError("window_size must be > 0")
+    s = daily.copy()
+    idx = s.index
 
-    result: List[float] = []
-    for i in range(len(values)):
-        start = max(0, i - window_size + 1)
-        window = values[start : i + 1]
-        # Wenn values Strings sind, knallt sum(window) im Debugging sehr gut nachvollziehbar.
-        result.append(sum(window) / len(window))
-    return result
+    years = idx.year
+    doy = idx.dayofyear
+
+    mat = pd.DataFrame({"year": years, "doy": doy, "temp": s.values})
+    pivot = mat.pivot_table(index="year", columns="doy", values="temp", aggfunc="mean")
+
+    # Spalten lückenlos 1..366, damit Heatmap stabil ist
+    pivot = pivot.reindex(columns=range(1, 367))
+
+    return pivot
 
 
-def extract_values(readings: Sequence[Reading]) -> List[float]:
-    """Extrahiert die numerischen Werte aus den Messungen."""
-    return [r.value for r in readings]
+def rolling_mean(series: pd.Series, days: int = 7) -> pd.Series:
+    """Gleitender Mittelwert über 'days' Tage (für Glättung)."""
+    return series.rolling(window=days, min_periods=max(1, days // 2)).mean()

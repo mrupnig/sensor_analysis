@@ -1,21 +1,33 @@
 from pathlib import Path
 
-from sensorlib.data_loader import load_readings
-from sensorlib.processing import extract_values, filter_outliers, moving_average
-from sensorlib.visualization import plot_series
-
+from sensorlib.data_loader import load_weather_csv
+from sensorlib.processing import year_doy_heatmap_matrix
+from sensorlib.visualization import plot_year_doy_heatmap
 
 def main() -> None:
     project_root = Path(__file__).resolve().parent
-    csv_path = project_root / "data" / "sensor_readings.csv"
+    csv_path = project_root / "data" / "metadata.txt"
 
-    readings = load_readings(csv_path)
-    raw_values = extract_values(readings)
+    # Passe Spaltennamen an deine CSV an:
+    df = load_weather_csv(
+        csv_path,
+        timestamp_col="timestamp",
+        temperature_col="temperature",
+        tz=None,  # z.B. "Europe/Berlin" falls nötig
+    )
 
-    cleaned = filter_outliers(raw_values, upper_threshold=100.0)
-    smoothed = moving_average(cleaned, window_size=3)
+    #df = remove_physical_outliers(df)
+    
+    if "temp" not in df.columns:
+        raise KeyError("Spalte 'temp' fehlt. Verwende load_weather_csv().")
 
-    plot_series(raw_values, cleaned, smoothed)
+    # Tagesmittel (Kalendertage)
+    daily = df["temp"].resample("D").mean()
+    daily.dropna()
+    
+    mat = year_doy_heatmap_matrix(daily)
+
+    plot_year_doy_heatmap(mat)
 
 
 if __name__ == "__main__":

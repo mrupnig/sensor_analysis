@@ -1,28 +1,54 @@
-import csv
-from dataclasses import dataclass
+from __future__ import annotations
+
 from pathlib import Path
-from typing import List
+from typing import Optional
 
+import pandas as pd
 
-@dataclass(frozen=True)
-class Reading:
-    timestamp: str
-    value: float  # semantisch "float", aber der Loader macht gleich den Bug (siehe unten)
-
-
-def load_readings(csv_path: Path) -> List[Reading]:
+def load_weather_csv(
+    csv_path: Path,
+    timestamp_col: str = "timestamp",
+    temperature_col: str = "temperature",
+    tz: Optional[str] = None,
+) -> pd.DataFrame:
     """
-    Lädt Sensorwerte aus einer CSV-Datei.
+    Lädt Wetterstationsdaten aus einer CSV.
 
-    Erwartete Spalten:
-      - timestamp
-      - value
+    Erwartung:
+      - Eine Zeitspalte (timestamp_col), die zu datetime parsebar ist
+      - Eine Temperaturspalte (temperature_col) in Grad (float)
+
+    Rückgabe:
+      DataFrame mit DatetimeIndex und einer Spalte 'temperature'.
     """
-    readings: List[Reading] = []
-    with csv_path.open("r", encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            # BUG: value wird NICHT in float umgewandelt (bleibt str).
-            # Das führt später in processing.py zu einem Fehler beim Rechnen.
-            readings.append(Reading(timestamp=row["timestamp"], value=row["value"]))  # type: ignore[arg-type]
-    return readings
+    df = pd.read_csv(csv_path)
+
+    if timestamp_col not in df.columns:
+        raise KeyError(f"timestamp_col '{timestamp_col}' nicht in CSV-Spalten: {list(df.columns)}")
+    if temperature_col not in df.columns:
+        raise KeyError(f"temperature_col '{temperature_col}' nicht in CSV-Spalten: {list(df.columns)}")
+
+    df[timestamp_col] = pd.to_datetime(
+        df[timestamp_col],
+        format="%d.%m.%Y",
+        errors="coerce")
+        
+    df = df.dropna(subset=[timestamp_col])
+
+    # Temperatur robust numerisch
+    df["temp"] = pd.to_numeric(
+        df[temperature_col].astype(str).str.replace(".", "", regex=False),
+        errors="coerce")
+
+    df = df.dropna(subset=["temp"])
+
+    df = df.set_index(timestamp_col).sort_index()
+
+    # Optional: Zeitzone setzen/konvertieren
+    if tz is not None:
+        if df.index.tz is None:
+            df.index = df.index.tz_localize(tz)
+        else:
+            df.index = df.index.tz_convert(tz)
+
+    return df[["temp"]]

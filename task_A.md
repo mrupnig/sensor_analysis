@@ -1,104 +1,200 @@
-## Aufgabenblatt: IDE-Usability – Weather Monitor Projekt
+# Usability- und UX-Studie: Aufgabenstellungen für IDE-Vergleich (PyCharm vs. Spyder)
 
-Dieses Aufgabenblatt dient der Erhebung von Usability- und Effizienzmerkmalen verschiedener IDEs anhand eines gemeinsamen Python-Projekts. Jede Teilaufgabe misst bestimmte Interaktionsaspekte wie Navigation, Debugging, Refactoring oder Git-Workflows.
+Grundlage ist das bereitgestellte Python-Projekt `sensor_analysis`.  
+Die folgenden Teilaufgaben sollen **in der jeweiligen IDE** bearbeitet werden.  
+Die Aufgaben sind **offen formuliert**; es wird **kein konkreter Lösungsweg vorgegeben**.  
+Der jeweils beschriebene *Idealpfad* dient ausschließlich der Auswertung und Beobachtung.
+
+---
+## Explorationsphase
 
 ---
 
-### Explorationsphase:
+## Teilaufgabe A – Projekt öffnen & Überblick verschaffen
 
-Öffnen Sie die IDE und machen Sie sich mit der Nutzeroberfläche vertraut. Explorieren Sie die Oberfläche, um sich einen Überlick zu verschaffen.
+### Kontext
+Du arbeitest mit einem bestehenden Python-Projekt, das aus mehreren Dateien und Ordnern besteht.  
+Ziel ist es, sich einen ersten Überblick über Struktur und Einstiegspunkt des Projekts zu verschaffen.
 
----
+### Aufgabenstellung
+Öffne das Projekt in der IDE und verschaffe dir einen Überblick über Aufbau und Inhalte.  
+Führe anschließend das Programm aus.
 
-### Teilaufgabe A – Projekt öffnen & Überblick (Projektverwaltung, Navigation)
+### Idealpfad (nicht vorgeben)
+- Projektordner als Projekt/Workspace in der IDE öffnen  
+- Projektstruktur im Datei-/Projektbrowser erkunden  
+- Datei `main.py` als Einstiegspunkt identifizieren  
+- `main.py` im Editor öffnen  
+- Programm über die IDE ausführen (z. B. Run-Button oder Run-Konfiguration)
+- Abhängigkeiten installieren
 
-**Instruktion**
-
-- Öffnen Sie das Projekt `sensor_analysis` als Projekt/Workspace in der IDE.
-- Finden Sie die Datei, `main.py`, und führen Sie das Programm aus.
-- Navigieren Sie von `main()` zu der Funktion, die den gleitenden Durchschnitt berechnet.
-
-**Misst** 
-
-Projektverwaltung, Projekt-Öffnen, Navigation (Go to Definition), Run-Konfiguration.
-
----
-
-### Teilaufgabe B – Debugging
-
-Ziel: Sie sollen den Bug in `moving_average` finden und beheben.
-
-**Instruktion**
-
-- Führen Sie die Tests aus und prüfen Sie, ob alle Tests bestehen.
-- Finden Sie den Fehler, der zum Fehlschlag von `test_moving_average_simple` führt.
-- Nutzen Sie dabei den Debugger der IDE (Breakpoints setzen, Schritt-für-Schritt-Ausführung, Variablen inspizieren).
-
-**Misst**
-
-Testausführung (Run/Debug-Konfiguration, Test-Integration)
-Debugger-Usability (Breakpoints, Step into/over, Variable Inspector)
-Darstellung von Stacktrace/Syntax-Highlighting von Fehlern
+### Misst
+- Projektverwaltung / Projektöffnung
+- Orientierung in der Projektstruktur
+- Navigation zwischen Dateien
+- Auffindbarkeit von Run-Funktionen
+- Erstverständnis der IDE-Oberfläche
 
 ---
 
-### Teilaufgabe C – Refactoring
+## Teilaufgabe B – Debugging
 
-Ziel: Nutzung der Refactoring-Funktionen (nicht „suchen/ersetzen“ per Hand).
+### Kontext
+Das Programm soll die "Sensordaten" aus dem `data` Ordner laden und zu einem Plot verarbeiten. 
+Im Projekt sind ein paar Fehler enthalten, die dazu führen, dass das Programm nicht wie erwartet ausgeführt wird. Diese Fehler sollen mithilfe der IDE gefunden und behoben werden. Erst muss der Pfad angepasst werden, damit die richtige csv Datei geladen wird. Dann funktioniert das Programm, aber es wird ein leerer Plot ausgegeben. Es gibt zwei Fehler im Code, die gefunden und behoben werden sollen.
 
-**Instruktion**
+### Aufgabenstellung
 
-- Rename Refactoring
 
-    - Benennen Sie die Funktion `remove_outliers` in `filter_outliers` um. Verwenden Sie dafür die Refactoring-Funktion der IDE (kein manuelles Suchen/Ersetzen). Achten Sie darauf, dass Tests und `main.py` weiterhin funktionieren.
+### Idealpfad (nicht vorgeben)
+- Fehlermeldung identifizieren
+- Zur betroffenen Fehlerquelle in `main.py` navigieren
+- Pfad anpassen
+- Programm erneut ausführen
+- leeren Plot identifizieren
+- Breakpoints setzen
+- Debugger starten
+- Variablenwerte inspizieren und Programmausführung schrittweise verfolgen
+- Fehlerquelle ausfindig machen
+- Codezeilen korrigieren
+
+### Lösungsvorschlag
+in `data_loader.py` folgenden Code bearbeiten
+
+vorher:
+```python
+    df[timestamp_col] = pd.to_datetime(
+            df[timestamp_col],
+            format="%d.%m.%Y",
+            errors="coerce")
+
+            # ...
+
+    df["temp"] = pd.to_numeric(
+            df[temperature_col].astype(str).str.replace(".", "", regex=False),
+            errors="coerce")
+```
+nachher:
+```python
+    df[timestamp_col] = pd.to_datetime(
+            df[timestamp_col],
+            errors="coerce")
+            
+            # ...
+
+    df["temp"] = pd.to_numeric(
+            df[temperature_col],
+            errors="coerce")
+```
+
+### Misst
+- Darstellung und Verständlichkeit von Fehlermeldungen
+- Debugger-Usability (Breakpoints, Step-Funktionen, Variableninspektion)
+- Kognitive Belastung beim Debugging
 
 ---
 
-### Teilaufgabe D – Autocomplete & Syntax-Highlighting (kleine Funktionserweiterung)
+## Teilaufgabe C – Refactoring
 
-Ziel: Die Personen sollen eine kleine Erweiterung programmieren und dabei stark von Code Completion profitieren.
+### Kontext
+Der Code enthält Stellen, die funktional korrekt sind, aber strukturell verbessert werden können.  
+Diese Änderungen sollen mithilfe der Refactoring-Werkzeuge der IDE durchgeführt werden. In `main.py` gibt es einen Codeabschnitt, der das Tagesmittel berechnet. Das würde in einer Funktion besser aussehen:
 
-**Instruktion**
+- extrahiere eine Funktion
+- verschiebe die Funktion in eine andere Datei
+- importiere die Funktion und rufe sie an der ursprünglichen Stelle auf.
 
-- Fügen Sie in `analysis.py` eine neue Funktion hinzu:
+### Aufgabenstellung
+Verbessern Sie die Code-Struktur, indem Sie eine bestehende Funktion sinnvoll umbenennen  
+und eine kleine strukturelle Verbesserung im Code vornehmen, ohne das Verhalten zu ändern.
+Verschieben einer Funktion in eine andere Datei
+Umbenennen einer Funktion
+
+
+### Lösung
+
+in `main.py` gibt es folgenden Codeabschnitt:
 
 ```python
-def normalize(values: List[float]) -> List[float]:
-
-    if not values:
-        return []
-
-    min_val = min(values)
-    max_val = max(values)
-
-    if max_val == min_val:
-        return [0.0 for _ in values]
-
-    return [(v - min_val) / (max_val - min_val) for v in values]
+    # Tagesmittel (Kalendertage)
+    daily = df["temp"].resample("D").mean()
+    daily.dropna()
 ```
-**Misst**
+Dieser soll per Refactoring in eine Funktion gepackt werden. Diese Funktion soll in `processing.py` geschoben werden. An der ursprünglichen Stelle soll die Funktion aufgerufen werden.
 
-- Qualität der Code Completion
-- Lesbarkeit (Syntax-Highlighting, Fehleranzeigen)
-- Unterstützung bei Typannotationen / Imports
+### Idealpfad (nicht vorgeben)
+- markieren des korrekten Codeabschnttes
+- Umwandeln in eine Funktion
+- Funktionsnamen ändern und Änderungen automatisch anwenden lassen
+- Verschieben der Funktion
+- Importieren der Funktion
+- Aufrufen der Funktion an der richtigen Stelle
+- Sicherstellen, dass das Programm weiterhin lauffähig ist
+
+### Misst
+- Auffindbarkeit von Refactoring-Funktionen
+- Verständlichkeit von Refactoring-Dialogen
+- Vertrauen in automatische Code-Änderungen
+- Unterstützung bei projektweiten Änderungen
+- Rückmeldung der IDE bei potenziellen Problemen
 
 ---
 
-### Teilaufgabe E – Versionierung (Git)
+## Teilaufgabe D – Autocompletion & Syntax-Highlighting
 
-Das Projekt liegt als Git-Repo vor (mit einem initialen Commit).
+### Kontext
+Das Projekt soll um eine kleine zusätzliche Funktion erweitert werden.  
+Die Funktion ist vorgegeben und soll in eine bestehende Datei übernommen werden. Die Funktion soll anschließend in `main.py` importiert und an der richtigen Stelle aufgerufen werden.
 
-**Instruktion**
+### Aufgabenstellung
+Erstelle die Funktion an einer passenden Stelle.
 
-- Prüfen Sie den aktuellen Git-Status des Projekts in der IDE.“
-- Führen Sie nach Behebung des Bugs und nach dem Refactoring einen Commit durch mit der Nachricht *"Fix moving_average“*
-- Zeigen Sie sich den Unterschied (Diff) zur vorherigen Version für `analysis.py` an.“
+```python
+def remove_physical_outliers(df, min_temp=-40.0, max_temp=50.0):
+    return df[(df["temp"] >= min_temp) & (df["temp"] <= max_temp)]
+```
 
-Optional: 
-- Machen Sie die letzte Änderung in reporting.py rückgängig (Revert/Discard).“
+### Idealpfad (nicht vorgeben)
+- Datei `visualization.py` öffnen
+- Geeignete Stelle im Code finden
+- Funktionsdefinition manuell einfügen
+- Autovervollständigung für Typannotationen, Variablen und Funktionen nutzen
+- Syntax-Highlighting und Hinweise der IDE wahrnehmen
+- Datei speichern
+- Funktion in `main.py` importieren
+- kontrollieren, ob das Programm das gewünschte Ergebnis liefert
 
-**Misst**
+### Misst
+- Qualität der Autovervollständigung
+- Lesbarkeit durch Syntax-Highlighting
+- Unterstützung bei Typannotationen
+- Fehler- und Warnhinweise während der Eingabe
+- Schreibkomfort im Editor
 
-Integrierte Git-Unterstützung (Status, Diff, Commit)
-Transparenz von Änderungen (Diff-View)
-Bedienbarkeit von Revert/Discard
+---
+
+## Teilaufgabe E – Versionierung (Git)
+
+### Kontext
+Das Projekt ist bereits als Git-Repository vorbereitet.  
+Die vorgenommenen Änderungen sollen versioniert werden.
+
+### Aufgabenstellung
+Überprüfe den aktuellen Versionsstatus des Projekts und sichere deine Änderungen in einem Commit.  
+Betrachte anschließend die vorgenommenen Änderungen.
+
+### Idealpfad (nicht vorgeben)
+- Git-Status in der IDE aufrufen
+- Geänderte Dateien identifizieren
+- Diff-Ansicht für mindestens eine Datei öffnen
+- Commit mit aussagekräftiger Commit-Nachricht erstellen
+- Optional: eine Änderung verwerfen oder rückgängig machen
+
+### Misst
+- Integration von Versionskontrolle in der IDE
+- Verständlichkeit von Status- und Diff-Ansichten
+- Usability des Commit-Workflows
+- Unterstützung bei Revert/Discard-Aktionen
+- Transparenz von Code-Änderungen
+
+---
