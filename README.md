@@ -23,4 +23,4 @@ pip install -r requirements.txt
 ## Aufgaben
 
 die Aufgabenstellungen liegen hier:
-- [Aufgaben A](task_A.md)
+- [Aufgaben A](task.md)
