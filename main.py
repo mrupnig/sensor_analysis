@@ -1,15 +1,15 @@
 from pathlib import Path
 
-from sensorlib.data_loader import load_weather_csv
+from sensorlib.data_loader import LoadWeatherCsv
 from sensorlib.processing import year_doy_heatmap_matrix
-from sensorlib.visualization import plot_year_doy_heatmap
+from sensorlib.visualization import PlotYearDayHeatmap
 
 def main() -> None:
     project_root = Path(__file__).resolve().parent
     csv_path = project_root / "data" / "metadata.txt"
 
     # Passe Spaltennamen an deine CSV an:
-    df = load_weather_csv(
+    df = LoadWeatherCsv(
         csv_path,
         timestamp_col="timestamp",
         temperature_col="temperature",
@@ -19,7 +19,7 @@ def main() -> None:
     #df = remove_physical_outliers(df)
     
     if "temp" not in df.columns:
-        raise KeyError("Spalte 'temp' fehlt. Verwende load_weather_csv().")
+        raise KeyError("Spalte 'temp' fehlt. Verwende LoadWeatherCsv().")
 
     # Tagesmittel (Kalendertage)
     daily = df["temp"].resample("D").mean()
@@ -27,7 +27,7 @@ def main() -> None:
     
     mat = year_doy_heatmap_matrix(daily)
 
-    plot_year_doy_heatmap(mat)
+    PlotYearDayHeatmap(mat)
 
 
 if __name__ == "__main__":
