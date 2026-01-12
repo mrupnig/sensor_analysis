@@ -6,7 +6,7 @@ from sensorlib.visualization import PlotYearDayHeatmap
 
 def main() -> None:
     project_root = Path(__file__).resolve().parent
-    csv_path = project_root / "data" / "sensor_data.csv"
+    csv_path = project_root / "data" / "metadata.txt"
 
     # Passe Spaltennamen an deine CSV an:
     df = LoadWeatherCsv(
