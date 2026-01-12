@@ -30,14 +30,13 @@ def LoadWeatherCsv(
 
     df[timestamp_col] = pd.to_datetime(
         df[timestamp_col],
-        format="%d.%m.%Y",
         errors="coerce")
         
     df = df.dropna(subset=[timestamp_col])
 
     # Temperatur robust numerisch
     df["temp"] = pd.to_numeric(
-        df[temperature_col].astype(str).str.replace(".", "", regex=False),
+        df[temperature_col],
         errors="coerce")
 
     df = df.dropna(subset=["temp"])
