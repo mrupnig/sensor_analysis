@@ -7,7 +7,6 @@ Dieses kleine Python-Projekt dient dazu, typische IDE-Funktionalitäten in einer
 - Debugging
 - Refactoring
 - Code-Vervollständigung
-- Git-Integration / Versionierung
 
 ## Voraussetzungen
 
@@ -19,8 +18,3 @@ Installation der Test-Abhängigkeit:
 ```bash
 pip install -r requirements.txt
 ```
-
-## Aufgaben
-
-die Aufgabenstellungen liegen hier:
-- [Aufgaben A](task.md)
