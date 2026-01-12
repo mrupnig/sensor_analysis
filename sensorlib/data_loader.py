@@ -5,7 +5,7 @@ from typing import Optional
 
 import pandas as pd
 
-def LoadWeatherCsv(
+def load_weather_csv(
     csv_path: Path,
     timestamp_col: str = "timestamp",
     temperature_col: str = "temperature",

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def PlotYearDayHeatmap(matrix: pd.DataFrame, title: str = "Temperatur (Tagesmittel) – Jahr × Tag des Jahres") -> None:
+def plot_year_day_heatmap(matrix: pd.DataFrame, title: str = "Temperatur (Tagesmittel) – Jahr × Tag des Jahres") -> None:
     """
     Visualisiert die Jahr×DOY-Matrix als Heatmap.
     matrix: index=Jahr, columns=1..366, values=Temperatur

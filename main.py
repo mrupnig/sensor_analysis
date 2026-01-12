@@ -1,15 +1,15 @@
 from pathlib import Path
 
-from sensorlib.data_loader import LoadWeatherCsv
+from sensorlib.data_loader import load_weather_csv
 from sensorlib.processing import year_doy_heatmap_matrix
-from sensorlib.visualization import PlotYearDayHeatmap
+from sensorlib.visualization import plot_year_day_heatmap
 
 def main() -> None:
     project_root = Path(__file__).resolve().parent
     csv_path = project_root / "data" / "sensor_data.csv"
 
     # Passe Spaltennamen an deine CSV an:
-    df = LoadWeatherCsv(
+    df = load_weather_csv(
         csv_path,
         timestamp_col="timestamp",
         temperature_col="temperature",
@@ -27,7 +27,7 @@ def main() -> None:
     
     mat = year_doy_heatmap_matrix(daily)
 
-    PlotYearDayHeatmap(mat)
+    plot_year_day_heatmap(mat)
 
 
 if __name__ == "__main__":
